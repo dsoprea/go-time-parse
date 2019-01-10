@@ -1,3 +1,8 @@
+[![Build Status](https://travis-ci.org/dsoprea/go-time-parse.svg?branch=master)](https://travis-ci.org/dsoprea/go-time-parse)
+[![Coverage Status](https://coveralls.io/repos/github/dsoprea/go-time-parse/badge.svg?branch=master)](https://coveralls.io/github/dsoprea/go-time-parse?branch=master)
+[![GoDoc](https://godoc.org/github.com/dsoprea/go-time-parse?status.svg)](https://godoc.org/github.com/dsoprea/go-time-parse)
+
+
 # Overview
 
 This project converts from human-friendly duration expressions to `time.Duration` quantities. 
