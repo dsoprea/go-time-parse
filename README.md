@@ -18,8 +18,8 @@ There is one general function that'll try to decode a duration expression any wa
 
 There are also two specific functions that can be called directly if you know in advance what format to expect:
 
-- `timeparse.FormatToDuration(phrase string)`
-- `timeparse.HumanToDuration(phrase string)`
+- `FormatToDuration(phrase string)`
+- `HumanToDuration(phrase string)`
 
 These functions return both a `time.Duration` and a `PhraseType` indicating whether the phrase pointed to a specific time or just described an interval.
 
@@ -33,33 +33,31 @@ See the [ParseDuration](https://godoc.org/github.com/dsoprea/go-time-parse#examp
 
 "before" expressions:
 
-- "1 nanosecond ago": time.Nanosecond * 1 * -1
-- "1 microsecond ago": time.Microsecond * 1 * -1
-- "1 millisecond ago": time.Millisecond * 1 * -1
-- "1 second ago": time.Second * 1 * -1
-- "1 minute ago": time.Minute * 1 * -1
-- "1 month ago": time.Hour * 24 * 31 * 1 * -1
-- "6 days ago": time.Hour * 24 * 6 * -1
-- "1 week ago": time.Hour * 24 * 7 * 1 * -1
-- "2 weeks ago": time.Hour * 24 * 7 * 2 * -1
-- "2 months ago": time.Hour * 24 * 31 * 2 * -1
-- "2 years ago": time.Hour * 24 * 365 * 2 * -1
-- "a minute ago": time.Minute * 1 * -1
+- "1 nanosecond ago"
+- "1 microsecond ago"
+- "1 millisecond ago"
+- "1 second ago"
+- "1 minute ago"
+- "1 month ago"
+- "6 days ago"
+- "1 week ago"
+- "2 weeks ago"
+- "2 months ago"
+- "2 years ago"
+- "a minute ago"
 
 "after" expressions:
 
-- "1 second from now": time.Second * 1
-- "45 seconds from now": time.Second * 45
-- "21 hours from now": time.Hour * 21
-- "1 day from now": time.Hour * 24 * 1
-- "2 weeks from now": time.Hour * 24 * 7 * 2
-- "1 month from now": time.Hour * 24 * 31 * 1
-- "2 years from now": time.Hour * 24 * 365 * 2
-- "a minute from now": time.Minute * 1
+- "1 second from now"
+- "45 seconds from now"
+- "21 hours from now"
+- "1 day from now"
+- "2 weeks from now"
+- "1 month from now"
+- "2 years from now"
+- "a minute from now"
 
-Misc:
-
-- "now": 0
+In addition, the phrase "now" will be parsed as a zero duration with a "time" phrase-type.
 
 All of the above are interpreted as time-type phrases.
 
@@ -70,17 +68,17 @@ All of the above are interpreted as time-type phrases.
 
 ## Format-Style
 
-More concise expressions can be used to describe quantities, and may have a polarity to express negative durations:
+More concise expressions can be used to describe quantities, and may have an optional polarity to [explicitly] express positive/negative durations:
 
-- "12ns": time.Nanosecond * 12
-- "-23us": time.Microsecond * 23 * -1
-- "+34ms": time.Millisecond * 34
-- "45s": time.Second * 45
-- "56m": time.Minute * 56
-- "67h": time.Hour * 67
-- "78D": time.Hour * 24 * 78
-- "89W": time.Hour * 24 * 7 * 89
-- "90M": time.Hour * 24 * 31 * 90
-- "1Y": time.Hour * 365
+- "12ns"
+- "-23us"
+- "+34ms"
+- "45s"
+- "56m"
+- "67h"
+- "78D"
+- "89W"
+- "90M"
+- "1Y"
 
 These expressions are always interpreted as interval-type phrases.
