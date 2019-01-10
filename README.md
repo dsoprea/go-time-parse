@@ -21,6 +21,8 @@ There are also two specific functions that can be called directly if you know in
 - `timeparse.FormatToDuration(phrase string)`
 - `timeparse.HumanToDuration(phrase string)`
 
+These functions return both a `time.Duration` and a `PhraseType` indicating whether the phrase pointed to a specific time or just described an interval.
+
 
 # Examples
 
@@ -56,6 +58,12 @@ Misc:
 
 - "now": 0
 
+All of the above are interpreted as time-type phrases.
+
+"every" expressions can also be provided and will always be interpreted as interval-type phrases:
+
+- "every six hours"
+
 
 ## Format-Style
 
@@ -71,3 +79,5 @@ More concise expressions can be used to describe quantities, and may have a pola
 - "89W": time.Hour * 24 * 7 * 89
 - "90M": time.Hour * 24 * 31 * 90
 - "1Y": time.Hour * 365
+
+These expressions are always interpreted as interval-type phrases.

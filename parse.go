@@ -17,12 +17,20 @@ const (
     oneYear  = oneDay * 365
 )
 
+type PhraseType string
+
+const (
+    PhraseTypeTime     PhraseType = "time"
+    PhraseTypeInterval PhraseType = "interval"
+)
+
 var (
-    formatRe       = regexp.MustCompile(`^([+-])?([0-9]+)([a-zA-Z]+)$`)
-    humanPast1Re   = regexp.MustCompile(`^([0-9]+) +([a-z]+) +ago$`)
-    humanPast2Re   = regexp.MustCompile(`^a[n]? +([a-z]+) +ago$`)
-    humanFuture1Re = regexp.MustCompile(`^([0-9]+) +([a-z]+) +from +now$`)
-    humanFuture2Re = regexp.MustCompile(`^a[n]? +([a-z]+) +from +now$`)
+    formatRe         = regexp.MustCompile(`^([+-])?([0-9]+)([a-zA-Z]+)$`)
+    humanPast1Re     = regexp.MustCompile(`^([0-9]+) +([a-z]+) +ago$`)
+    humanPast2Re     = regexp.MustCompile(`^a[n]? +([a-z]+) +ago$`)
+    humanFuture1Re   = regexp.MustCompile(`^([0-9]+) +([a-z]+) +from +now$`)
+    humanFuture2Re   = regexp.MustCompile(`^a[n]? +([a-z]+) +from +now$`)
+    humanInterval1Re = regexp.MustCompile(`^every ([0-9]+) +([a-z]+)$`)
 
     DurationMap = map[string]time.Duration{
         "nanosecond":   time.Nanosecond,
@@ -52,7 +60,7 @@ var (
     ErrInvalidFormat = errors.New("invalid format")
 )
 
-func FormatToDuration(phrase string) (duration time.Duration, err error) {
+func FormatToDuration(phrase string) (duration time.Duration, phraseType PhraseType, err error) {
     defer func() {
         if state := recover(); state != nil {
             err = log.Wrap(state.(error))
@@ -104,10 +112,10 @@ func FormatToDuration(phrase string) (duration time.Duration, err error) {
     }
 
     duration = durationUnit * time.Duration(n)
-    return duration, nil
+    return duration, PhraseTypeInterval, nil
 }
 
-func HumanToDuration(phrase string) (duration time.Duration, err error) {
+func HumanToDuration(phrase string) (duration time.Duration, phraseType PhraseType, err error) {
     defer func() {
         if state := recover(); state != nil {
             err = log.Wrap(state.(error))
@@ -117,7 +125,26 @@ func HumanToDuration(phrase string) (duration time.Duration, err error) {
     phrase = strings.TrimSpace(phrase)
     phrase = strings.ToLower(phrase)
 
-    parts := humanPast1Re.FindStringSubmatch(phrase)
+    parts := humanInterval1Re.FindStringSubmatch(phrase)
+    if parts != nil {
+        nPhrase := parts[1]
+        unitPhrase := parts[2]
+
+        n, err := strconv.Atoi(nPhrase)
+        if err != nil {
+            log.Panic(ErrInvalidFormat)
+        }
+
+        durationUnit, found := DurationMap[unitPhrase]
+        if found == false {
+            log.Panic(ErrInvalidFormat)
+        }
+
+        duration = durationUnit * time.Duration(n)
+        return duration, PhraseTypeInterval, nil
+    }
+
+    parts = humanPast1Re.FindStringSubmatch(phrase)
     if parts != nil {
         nPhrase := parts[1]
         unitPhrase := parts[2]
@@ -133,7 +160,7 @@ func HumanToDuration(phrase string) (duration time.Duration, err error) {
         }
 
         duration = durationUnit * time.Duration(n) * -1
-        return duration, nil
+        return duration, PhraseTypeTime, nil
     }
 
     parts = humanPast2Re.FindStringSubmatch(phrase)
@@ -146,7 +173,7 @@ func HumanToDuration(phrase string) (duration time.Duration, err error) {
         }
 
         duration = durationUnit * 1 * -1
-        return duration, nil
+        return duration, PhraseTypeTime, nil
     }
 
     parts = humanFuture1Re.FindStringSubmatch(phrase)
@@ -165,7 +192,7 @@ func HumanToDuration(phrase string) (duration time.Duration, err error) {
         }
 
         duration = durationUnit * time.Duration(n)
-        return duration, nil
+        return duration, PhraseTypeTime, nil
     }
 
     parts = humanFuture2Re.FindStringSubmatch(phrase)
@@ -178,33 +205,33 @@ func HumanToDuration(phrase string) (duration time.Duration, err error) {
         }
 
         duration = durationUnit * 1
-        return duration, nil
+        return duration, PhraseTypeTime, nil
     }
 
     if phrase == "now" {
         duration = time.Duration(0)
-        return duration, nil
+        return duration, PhraseTypeTime, nil
     }
 
     log.Panic(ErrInvalidFormat)
-    return duration, nil
+    return duration, "", nil
 }
 
-func ParseDuration(phrase string) (duration time.Duration, err error) {
-    duration, err = FormatToDuration(phrase)
+func ParseDuration(phrase string) (duration time.Duration, phraseType PhraseType, err error) {
+    duration, phraseType, err = FormatToDuration(phrase)
     if err == nil {
-        return duration, nil
+        return duration, phraseType, nil
     } else if log.Is(err, ErrInvalidFormat) == false {
         log.PanicIf(err)
     }
 
-    duration, err = HumanToDuration(phrase)
+    duration, phraseType, err = HumanToDuration(phrase)
     if err == nil {
-        return duration, nil
+        return duration, phraseType, nil
     } else if log.Is(err, ErrInvalidFormat) == false {
         log.PanicIf(err)
     }
 
     log.PanicIf(err)
-    return duration, nil
+    return duration, "", nil
 }
