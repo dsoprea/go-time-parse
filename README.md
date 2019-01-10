@@ -26,6 +26,9 @@ These functions return both a `time.Duration` and a `PhraseType` indicating whet
 
 # Examples
 
+See the [ParseDuration](https://godoc.org/github.com/dsoprea/go-time-parse#example-ParseDuration) testable example.
+
+
 ## Human-Style
 
 "before" expressions:
