@@ -57,13 +57,13 @@ See the [ParseDuration](https://godoc.org/github.com/dsoprea/go-time-parse#examp
 - "2 years from now"
 - "a minute from now"
 
-In addition, the phrase "now" will be parsed as a zero duration with a "time" phrase-type.
-
 All of the above are interpreted as time-type phrases.
+
+In addition, the phrase "now" will be parsed as a zero duration with a "time" phrase-type.
 
 "every" expressions can also be provided and will always be interpreted as interval-type phrases:
 
-- "every six hours"
+- "every 6 hours"
 
 
 ## Format-Style
